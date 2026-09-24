@@ -269,7 +269,8 @@ class Player6(BasePlayer):
 		right_start = min(AGE_BINS, candidate_age + free_radius + 1)
 		left = candidate_age * mass[left_end] - moment[left_end]
 		right = (
-			moment[AGE_BINS] - moment[right_start]
+			moment[AGE_BINS]
+			- moment[right_start]
 			- candidate_age * (mass[AGE_BINS] - mass[right_start])
 		)
 		return fade * (left + right)
@@ -314,9 +315,8 @@ class Player6(BasePlayer):
 		recent = self.spend_history[-7:]
 		recent_rate = sum(recent) / len(recent) if recent else 0.0
 		momentum_rate = (
-			(1.0 - SPEND_MOMENTUM_WEIGHT) * self.recent_spend_rate
-			+ SPEND_MOMENTUM_WEIGHT * recent_rate
-		)
+			1.0 - SPEND_MOMENTUM_WEIGHT
+		) * self.recent_spend_rate + SPEND_MOMENTUM_WEIGHT * recent_rate
 
 		# Terminal socks can disappear without a voluntary discard. Convert their
 		# observed frequency into expected pack spending across the household.
@@ -377,19 +377,20 @@ class Player6(BasePlayer):
 			turn.budget_remaining - reserve - projected_roommate_spend,
 		)
 		budget_dollars_per_day = self.estimated_budget / max(1, self.days)
-		self.inventory_cost_scale = 1.0 / (
-			1.0 + 3.0 * max(0.0, budget_dollars_per_day - 0.50)
-		)
+		self.inventory_cost_scale = 1.0 / (1.0 + 3.0 * max(0.0, budget_dollars_per_day - 0.50))
 		residual_share = min(
 			1.0,
-			1.0 / max(1, self.roommates)
-			+ 1.5 * max(0.0, budget_dollars_per_day - 0.20),
+			1.0 / max(1, self.roommates) + 1.5 * max(0.0, budget_dollars_per_day - 0.20),
 		)
 		allowed_daily_dollars = personal_slack / days_left * residual_share
 		self.expected_replacement_rate = (
-			max(self.roommate_spend_rate, self.recent_spend_rate)
-			+ min(0.03, 0.20 * allowed_daily_dollars)
-		) * 6.0 / PACK_COST
+			(
+				max(self.roommate_spend_rate, self.recent_spend_rate)
+				+ min(0.03, 0.20 * allowed_daily_dollars)
+			)
+			* 6.0
+			/ PACK_COST
+		)
 		self.discard_credit = min(
 			CREDIT_CAP,
 			self.discard_credit + allowed_daily_dollars / SOCK_REPLACEMENT_COST,
@@ -489,7 +490,8 @@ class Player6(BasePlayer):
 				colour,
 				self._age(shade),
 				self.lifecycle_prefixes[colour][-1],
-			) / 255.0,
+			)
+			/ 255.0,
 		)
 		cost = LEFTOVER_BURDEN_WEIGHT * (
 			0.85 * self._age_score(shade)
