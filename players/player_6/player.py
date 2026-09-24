@@ -230,7 +230,9 @@ class Player6(BasePlayer):
 		for colour in range(2):
 			current = [
 				FAST_HIST_WEIGHT * fast + SLOW_HIST_WEIGHT * slow
-				for fast, slow in zip(self.fast_age_hist[colour], self.slow_age_hist[colour])
+				for fast, slow in zip(
+					self.fast_age_hist[colour], self.slow_age_hist[colour], strict=True
+				)
 			]
 			total = sum(current)
 			if total > 0.0:
@@ -483,7 +485,6 @@ class Player6(BasePlayer):
 	def _kept_sock_cost(self, shade: int) -> float:
 		"""Future drawer burden of returning one leftover unchanged."""
 		colour = 0 if self._is_black(shade) else 1
-		projected = self.projected_age_hist[colour]
 		projected_match = 1.0 - min(
 			1.0,
 			self._expected_mismatch(
